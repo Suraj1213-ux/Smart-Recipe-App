@@ -16,10 +16,10 @@ const Navbar = () => {
                 
                     <img 
                         src="https://i.pinimg.com/originals/e4/6b/e6/e46be6459dc4d30cc535b68331d8b6e7.jpg" // Replace with the path to your logo image
-                        alt="Recipe Finder Logo" 
+                        alt="Smart Recipe Logo" 
                         className="h-12 w-auto" // Adjust size as needed
                     /> 
-                    <h3 className="text-black">Recipe Finder</h3>
+                    <h3 className="text-black">Smart Recipe</h3>
                 </Link>
                 {/* Navbar Links */}
                 <div className="hidden md:flex space-x-8">

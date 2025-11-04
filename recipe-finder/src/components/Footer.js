@@ -6,7 +6,7 @@ const Footer = () => {
         <footer className="bg-gray-900 text-white text-center p-6 mt-8">
             {/* Footer Text */}
             <p className="text-lg font-semibold">
-                &copy; {new Date().getFullYear()} Recipe Finder. All Rights Reserved.
+                &copy; {new Date().getFullYear()} Smart Recipe. All Rights Reserved.
             </p>
 
             {/* Navigation Links */}
