@@ -1,12 +1,19 @@
+// src/redux/recipeSlice.js
+
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 // Async thunk for fetching recipes
 export const fetchRecipes = createAsyncThunk(
     'recipes/fetchRecipes',
     async (query) => {
-        const response = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`);
+        // Updated to handle both search by name and filter by category (like Vegetarian)
+        const url = query.startsWith('filter') 
+            ? `https://www.themealdb.com/api/json/v1/1/${query}` // e.g., filter.php?c=Vegetarian
+            : `https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`; // e.g., search.php?s=chicken
+            
+        const response = await fetch(url);
         const data = await response.json();
-        return data.meals || [];  // return the array of meals or empty array if no recipes found
+        return data.meals || []; 
     }
 );
 
@@ -14,17 +21,22 @@ const recipeSlice = createSlice({
     name: 'recipes',
     initialState: {
         recipes: [],
-        savedRecipes: [],  // Initialize savedRecipes to an empty array
-        status: 'idle',  // 'idle', 'loading', 'succeeded', 'failed'
+        savedRecipes: [], 
+        status: 'idle', 
+        error: null,
     },
     reducers: {
         saveRecipe: (state, action) => {
-            // Add the recipe to savedRecipes array
-            state.savedRecipes.push(action.payload);
+            // action.payload should be the full recipe object
+            const newRecipe = action.payload;
+            // Prevent saving duplicates based on idMeal
+            if (!state.savedRecipes.some(recipe => recipe.idMeal === newRecipe.idMeal)) {
+                state.savedRecipes.push(newRecipe);
+            }
         },
         removeRecipe: (state, action) => {
-            // Remove the recipe from savedRecipes array
-            state.savedRecipes = state.savedRecipes.filter(recipe => recipe !== action.payload);
+            // action.payload should be the idMeal of the recipe to remove
+            state.savedRecipes = state.savedRecipes.filter(recipe => recipe.idMeal !== action.payload);
         }
     },
     extraReducers: (builder) => {
@@ -36,8 +48,9 @@ const recipeSlice = createSlice({
                 state.status = 'succeeded';
                 state.recipes = action.payload;
             })
-            .addCase(fetchRecipes.rejected, (state) => {
+            .addCase(fetchRecipes.rejected, (state, action) => { // Added action for error message
                 state.status = 'failed';
+                state.error = action.error.message || 'Failed to fetch recipes';
             });
     }
 });
